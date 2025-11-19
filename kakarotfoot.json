@@ -1,0 +1,220 @@
+[
+  {
+    "id": "1000",
+    "url": "101123h00-torneo-lpf-dep--riestra-independiente-streaming",
+    "logo": "ar",
+    "type": "Football",
+    "time": "1762812000000",
+    "home": "Dep. Riestra",
+    "away": "Independiente",
+    "league": "Torneo LPF",
+    "streams": [{ "ch": "75", "lang": "es" }]
+  },
+  {
+    "id": "1001",
+    "url": "111101h00-ecuador-ligapro-aucas-delfin-streaming",
+    "logo": "ec",
+    "type": "Football",
+    "time": "1762819200000",
+    "home": "Aucas",
+    "away": "Delfin",
+    "league": "Ecuador Ligapro",
+    "streams": [{ "ch": "86", "lang": "es" }]
+  },
+  {
+    "id": "1002",
+    "url": "111101h00-nba-charlotte-hornets-los-angeles-lakers-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762819200000",
+    "home": "Charlotte Hornets",
+    "away": "Los Angeles Lakers",
+    "league": "NBA",
+    "streams": [{ "ch": "170", "lang": "us" }]
+  },
+  {
+    "id": "1003",
+    "url": "111101h00-nba-detroit-pistons-washington-wizards-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762819200000",
+    "home": "Detroit Pistons",
+    "away": "Washington Wizards",
+    "league": "NBA",
+    "streams": [
+      { "ch": "1", "lang": "fr" },
+      { "ch": "171", "lang": "us" }
+    ]
+  },
+  {
+    "id": "1004",
+    "url": "111101h00-nba-orlando-magic-portland-trail-blazers-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762819200000",
+    "home": "Orlando Magic",
+    "away": "Portland Trail Blazers",
+    "league": "NBA",
+    "streams": [{ "ch": "172", "lang": "us" }]
+  },
+  {
+    "id": "1005",
+    "url": "111101h00-nhl-new-jersey-devils-new-york-islanders-streaming",
+    "logo": "nhl",
+    "type": "Hockey",
+    "time": "1762819200000",
+    "home": "New Jersey Devils",
+    "away": "New York Islanders",
+    "league": "NHL",
+    "streams": [{ "ch": "173", "lang": "us" }]
+  },
+  {
+    "id": "1006",
+    "url": "111101h00-nhl-new-york-rangers-nashville-predators-streaming",
+    "logo": "nhl",
+    "type": "Hockey",
+    "time": "1762819200000",
+    "home": "New York Rangers",
+    "away": "Nashville Predators",
+    "league": "NHL",
+    "streams": [{ "ch": "174", "lang": "us" }]
+  },
+  {
+    "id": "1007",
+    "url": "111101h15-torneo-lpf-argentinos-jrs-belgrano-streaming",
+    "logo": "ar",
+    "type": "Football",
+    "time": "1762820100000",
+    "home": "Argentinos Jrs",
+    "away": "Belgrano",
+    "league": "Torneo LPF",
+    "streams": [{ "ch": "75", "lang": "es" }]
+  },
+  {
+    "id": "1008",
+    "url": "111101h15-torneo-lpf-ind--rivadavia-central-cordoba-streaming",
+    "logo": "ar",
+    "type": "Football",
+    "time": "1762820100000",
+    "home": "Ind. Rivadavia",
+    "away": "Central Cordoba",
+    "league": "Torneo LPF",
+    "streams": [{ "ch": "76", "lang": "es" }]
+  },
+  {
+    "id": "1009",
+    "url": "111101h30-copa-colombia-ind--medellin-envigado-streaming",
+    "logo": "coc",
+    "type": "Football",
+    "time": "1762821000000",
+    "home": "Ind. Medellin",
+    "away": "Envigado",
+    "league": "Copa Colombia",
+    "streams": [{ "ch": "81", "lang": "es" }]
+  },
+  {
+    "id": "1010",
+    "url": "111101h30-nba-miami-heat-cleveland-cavaliers-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762821000000",
+    "home": "Miami Heat",
+    "away": "Cleveland Cavaliers",
+    "league": "NBA",
+    "streams": [{ "ch": "175", "lang": "us" }]
+  },
+  {
+    "id": "1011",
+    "url": "111102h00-nba-chicago-bulls-san-antonio-spurs-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762822800000",
+    "home": "Chicago Bulls",
+    "away": "San Antonio Spurs",
+    "league": "NBA",
+    "streams": [{ "ch": "176", "lang": "us" }]
+  },
+  {
+    "id": "1012",
+    "url": "111102h15-nfl-green-bay-packers-philadelphia-eagles-streaming",
+    "logo": "nfl",
+    "type": "FootUS",
+    "time": "1762823700000",
+    "home": "Green Bay Packers",
+    "away": "Philadelphia Eagles",
+    "league": "NFL",
+    "streams": [
+      { "ch": "2", "lang": "fr" },
+      { "ch": "177", "lang": "us" },
+      { "ch": "88", "lang": "es" },
+      { "ch": "97", "lang": "es" },
+      { "ch": "71", "lang": "es" }
+    ]
+  },
+  {
+    "id": "1013",
+    "url": "111102h30-nba-dallas-mavericks-milwaukee-bucks-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762824600000",
+    "home": "Dallas Mavericks",
+    "away": "Milwaukee Bucks",
+    "league": "NBA",
+    "streams": [{ "ch": "178", "lang": "us" }]
+  },
+  {
+    "id": "1014",
+    "url": "111102h30-nhl-edmonton-oilers-columbus-blue-jackets-streaming",
+    "logo": "nhl",
+    "type": "Hockey",
+    "time": "1762824600000",
+    "home": "Edmonton Oilers",
+    "away": "Columbus Blue Jackets",
+    "league": "NHL",
+    "streams": [{ "ch": "179", "lang": "us" }]
+  },
+  {
+    "id": "1015",
+    "url": "111103h00-nba-phoenix-suns-new-orleans-pelicans-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762826400000",
+    "home": "Phoenix Suns",
+    "away": "New Orleans Pelicans",
+    "league": "NBA",
+    "streams": [{ "ch": "180", "lang": "us" }]
+  },
+  {
+    "id": "1016",
+    "url": "111103h00-nba-utah-jazz-minnesota-timberwolves-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762826400000",
+    "home": "Utah Jazz",
+    "away": "Minnesota Timberwolves",
+    "league": "NBA",
+    "streams": [{ "ch": "181", "lang": "us" }]
+  },
+  {
+    "id": "1017",
+    "url": "111104h00-nhl-vegas-golden-knights-florida-panthers-streaming",
+    "logo": "nhl",
+    "type": "Hockey",
+    "time": "1762830000000",
+    "home": "Vegas Golden Knights",
+    "away": "Florida Panthers",
+    "league": "NHL",
+    "streams": [{ "ch": "182", "lang": "us" }]
+  },
+  {
+    "id": "1018",
+    "url": "111104h30-nba-los-angeles-clippers-atlanta-hawks-streaming",
+    "logo": "nba",
+    "type": "Basket",
+    "time": "1762831800000",
+    "home": "Los Angeles Clippers",
+    "away": "Atlanta Hawks",
+    "league": "NBA",
+    "streams": [{ "ch": "183", "lang": "us" }]
+  }
+]

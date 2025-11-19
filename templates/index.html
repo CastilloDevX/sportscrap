@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1 class="display-5 fw-semibold text-center mb-2">Sportstream</h1>
+<p class="text-center text-white mb-4">
+  El sitio donde puedes explorar todo el contenido de deportes en streaming disponible en la web.
+</p>
+
+<div class="row g-3 align-items-center justify-content-center mb-4">
+  <div class="col-12 col-lg-6">
+    <input id="searchInput" type="text" class="form-control form-control-lg input-dark" placeholder="Buscar por equipo, liga o evento...">
+  </div>
+  <div class="col-8 col-md-4 col-lg-3">
+    <select id="leagueFilter" class="form-select form-select-lg input-dark">
+      <option value="">Todas las ligas</option>
+      {# ligas únicas #}
+      {% set leagues = events | map(attribute='league') | list %}
+      {% for lig in leagues | unique | sort %}
+        {% if lig %}
+          <option value="{{ lig }}">{{ lig }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-4 col-md-2 col-lg-2 d-grid">
+    <button id="refreshBtn" class="btn btn-primary btn-lg">Refrescar datos</button>
+  </div>
+</div>
+
+<div class="table-responsive shadow-sm rounded overflow-hidden">
+  <table id="eventsTable" class="table table-dark table-striped align-middle mb-0">
+    <thead class="thead-app">
+      <tr>
+        <th>Fecha/Hora (UTC)</th>
+        <th>Liga</th>
+        <th>Partido</th>
+        <th class="text-center">Stream</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event in events %}
+        <tr data-league="{{ event.league | e }}">
+          <td>{{ event.start_time | datetime }}</td>
+          <td>{{ event.league }}</td>
+          <td>{{ event.home }} vs {{ event.away }}</td>
+          <td class="text-center">
+            {% for stream in event.streams %}
+              <a
+                class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2"
+                href="/stream?url={{ stream.url | urlencode }}&source={{ stream.source | urlencode }}"
+              >
+                <span>{{ stream.name }}</span>
+                {% if stream.language %}
+                  <span class="badge text-bg-dark border">{{ stream.language|upper }}</span>
+                {% endif %}
+              </a>
+
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
