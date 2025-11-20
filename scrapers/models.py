@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field, asdict
 from typing import List, Optional
 
+
 @dataclass
 class Stream:
     name: str
@@ -11,6 +12,7 @@ class Stream:
     def to_dict(self):
         return asdict(self)
 
+
 @dataclass
 class Event:
     id: str
@@ -20,10 +22,11 @@ class Event:
     home: str
     away: str
     start_time: int
+    provider: str
     streams: List[Stream] = field(default_factory=list)
 
+    # NUEVO → Tiempo visible para proveedores sin fecha real (ej: KevinSport)
+    match_time: str = ""
+
     def to_dict(self):
-        return {
-            **asdict(self),
-            "streams": [s.to_dict() for s in self.streams]
-        }
+        return asdict(self)
