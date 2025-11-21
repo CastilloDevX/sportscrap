@@ -4,37 +4,54 @@ import json
 import os
 from datetime import datetime
 
-# --- CONFIG ---
+from scrapers.service import ScraperService
+from scrapers.registry import provider_registry
+from dataclasses import asdict
+
+# Ubicación del archivo de caché
 CACHE_FILE = "cache/events.json"
 
 app = Flask(__name__)
 
+# Instanciamos el servicio de scrapers para generar eventos si no hay caché
+service = ScraperService(provider_registry)
 
-# ---------------------------- #
-#   UTILIDAD: Cargar cache     #
-# ---------------------------- #
+
 def load_events():
-    """Carga los eventos desde el archivo cacheado por el worker."""
-    if not os.path.exists(CACHE_FILE):
-        return []
+    # 1. Intentar leer la caché
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if data:
+                    return data
+        except Exception:
+            pass
+
+    # 2. Si no hay datos, ejecutar los scrapers y escribir cache
     try:
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
+        events = service.build_events()
+        data = [asdict(e) for e in events]
+        os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return data
+    except Exception as e:
+        print(f"Error generando eventos: {e}")
         return []
 
 
-# ---- FILTER datetime (necesario para Kakarotfoot) ----
+# Filtro de plantilla para convertir timestamps a fechas legibles
 @app.template_filter("datetime")
 def datetime_filter(ts):
     try:
         ts = int(ts)
-        return datetime.utcfromtimestamp(ts/1000).strftime("%Y-%m-%d %H:%M:%S") if ts > 0 else "-"
+        return datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S") if ts > 0 else "-"
     except Exception:
         return "-"
 
 
-# --------- PROXY PARA EVITAR REFERRER BLOCK ----------
+# Proxy para esquivar bloqueos de referer
 @app.route("/proxy")
 def proxy():
     target = request.args.get("u")
@@ -50,68 +67,57 @@ def proxy():
     return Response(r.content, content_type=r.headers.get("Content-Type"))
 
 
-# -------- INDEX --------
+# Página principal
 @app.route("/")
 def index():
     events = load_events()
     return render_template("index.html", events=events, title="Sportstream")
 
 
-# -------- API (opcional para AJAX) --------
+# Endpoint opcional para consultar eventos vía AJAX
 @app.route("/api/events")
 def api_events():
     return jsonify(load_events())
 
 
-# -------- STREAM PAGE --------
+# Página de stream individual
 @app.route("/stream")
 def stream():
     url = request.args.get("url")
     source = request.args.get("source")
     event_id = request.args.get("event")
 
-    # Cargar eventos del cache
+    # Cargar eventos desde cache
     events = load_events()
 
-    # Buscar evento
+    # Buscar el evento seleccionado
     event_obj = next((e for e in events if str(e.get("id")) == str(event_id)), None)
 
     if not event_obj:
         return "Evento no encontrado", 404
 
-    # STREAMS (los eventos cacheados ya traen streams en muchos casos)
+    # Los streams normalmente ya vienen en el evento cacheado
     event_streams = event_obj.get("streams", [])
 
-    # -------------------------
-    #  LIVE TV
-    # -------------------------
+    # Recargar streams para LiveTV, Kevinsport, etc. si el usuario lo pide
     if source and "livetv" in source.lower():
         from scrapers.providers.livetv import LiveTVProvider
         provider = LiveTVProvider()
         event_streams = provider._parse_event_streams(event_obj["url"])
-
-    # -------------------------
-    #  KEVINSPORT
-    # -------------------------
     elif source and "kevinsport" in source.lower():
         from scrapers.providers.kevinsport import KevinsportProvider
         provider = KevinsportProvider()
         event_streams = provider._get_event_streams(event_obj["url"])
-
         if url:
             url = f"/proxy?u={url}"
-
-    # -------------------------
-    #  KAKAROTFOOT
-    # -------------------------
     elif source and "kakarot" in source.lower():
-        pass  # Streams ya estaban listos
+        # Los streams de Kakarotfoot vienen listos en caché
+        pass
 
-    # Si no llega URL pero hay streams
+    # Si no hay URL pero hay streams, elegimos el primero
     if not url and event_streams:
         url = event_streams[0]["url"]
 
-    # Render
     return render_template(
         "stream.html",
         url=url,
@@ -124,7 +130,6 @@ def stream():
 
 
 if __name__ == "__main__":
-    # Railway requiere bindear a 0.0.0.0 y puerto ENV
-    import os
+    # Railway/Render necesitan bindear a 0.0.0.0 y usar el puerto de entorno
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=True)
