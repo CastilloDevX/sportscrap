@@ -1,13 +1,28 @@
 from flask import Flask, jsonify, render_template, request, Response
 import requests
+import json
+import os
 from datetime import datetime
-from scrapers.service import ScraperService
-from scrapers.registry import provider_registry
-from dataclasses import asdict
+
+# --- CONFIG ---
+CACHE_FILE = "cache/events.json"
 
 app = Flask(__name__)
 
-service = ScraperService(provider_registry)
+
+# ---------------------------- #
+#   UTILIDAD: Cargar cache     #
+# ---------------------------- #
+def load_events():
+    """Carga los eventos desde el archivo cacheado por el worker."""
+    if not os.path.exists(CACHE_FILE):
+        return []
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return []
+
 
 # ---- FILTER datetime (necesario para Kakarotfoot) ----
 @app.template_filter("datetime")
@@ -17,7 +32,6 @@ def datetime_filter(ts):
         return datetime.utcfromtimestamp(ts/1000).strftime("%Y-%m-%d %H:%M:%S") if ts > 0 else "-"
     except Exception:
         return "-"
-
 
 
 # --------- PROXY PARA EVITAR REFERRER BLOCK ----------
@@ -39,8 +53,14 @@ def proxy():
 # -------- INDEX --------
 @app.route("/")
 def index():
-    events = service.build_events()
+    events = load_events()
     return render_template("index.html", events=events, title="Sportstream")
+
+
+# -------- API (opcional para AJAX) --------
+@app.route("/api/events")
+def api_events():
+    return jsonify(load_events())
 
 
 # -------- STREAM PAGE --------
@@ -50,47 +70,48 @@ def stream():
     source = request.args.get("source")
     event_id = request.args.get("event")
 
-    # Volver a obtener eventos (pero sin streams pesados)
-    events = service.build_events()
+    # Cargar eventos del cache
+    events = load_events()
 
-    # Buscar el evento correspondiente
-    event_obj = next((e for e in events if str(e.id) == str(event_id)), None)
+    # Buscar evento
+    event_obj = next((e for e in events if str(e.get("id")) == str(event_id)), None)
 
     if not event_obj:
         return "Evento no encontrado", 404
 
-    # -------------------------
-    #  LAZY STREAMS POR PROVEEDOR
-    # -------------------------
-    event_streams = event_obj.streams  # En caso de Kakarotfoot o TiroAlPalo — ya vienen listos
+    # STREAMS (los eventos cacheados ya traen streams en muchos casos)
+    event_streams = event_obj.get("streams", [])
 
-    # LIVE TV
+    # -------------------------
+    #  LIVE TV
+    # -------------------------
     if source and "livetv" in source.lower():
         from scrapers.providers.livetv import LiveTVProvider
         provider = LiveTVProvider()
-        event_streams = provider._parse_event_streams(event_obj.url)
+        event_streams = provider._parse_event_streams(event_obj["url"])
 
-    # KEVINSPORT (necesita PROXY y streams extra)
+    # -------------------------
+    #  KEVINSPORT
+    # -------------------------
     elif source and "kevinsport" in source.lower():
         from scrapers.providers.kevinsport import KevinsportProvider
         provider = KevinsportProvider()
-        event_streams = provider._get_event_streams(event_obj.url)
+        event_streams = provider._get_event_streams(event_obj["url"])
 
-        # Aplicar PROXY al stream principal
         if url:
             url = f"/proxy?u={url}"
 
-    # KAKAROTFOOT – streams ya vienen listos
+    # -------------------------
+    #  KAKAROTFOOT
+    # -------------------------
     elif source and "kakarot" in source.lower():
-        pass  # Nada que hacer
+        pass  # Streams ya estaban listos
 
-    # Si por alguna razón el URL viene vacío
+    # Si no llega URL pero hay streams
     if not url and event_streams:
-        url = event_streams[0].url
+        url = event_streams[0]["url"]
 
-    # -------------------------
-    # Renderizar página
-    # -------------------------
+    # Render
     return render_template(
         "stream.html",
         url=url,
@@ -103,4 +124,7 @@ def stream():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Railway requiere bindear a 0.0.0.0 y puerto ENV
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=True)

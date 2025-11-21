@@ -2,4 +2,16 @@ Flask==3.0.3
 requests==2.32.3
 beautifulsoup4==4.12.3
 jinja2==3.1.6
-aiohttp
+
+# aiohttp para el provider Kevinsport
+aiohttp==3.10.5
+
+# Dependencia opcional de aiohttp para mejor rendimiento
+aiodns==3.0.0
+
+# Para evitar errores de dependencias internas
+charset-normalizer==3.4.0
+soupsieve==2.5
+idna==3.6
+urllib3==2.2.1
+certifi==2024.8.30
