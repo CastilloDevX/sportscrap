@@ -14,19 +14,31 @@ class TiroalpaloProvider(BaseProvider):
     def fetch_events(self) -> List[Event]:
         events = []
         try:
-            html = requests.get(self.LIST_URL, timeout=10).text
-        except:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+            html = requests.get(self.LIST_URL, timeout=15, headers=headers).text
+        except Exception as e:
+            print(f"[Tiroalpalo] Error descargando lista: {e}")
             return events
 
         soup = BeautifulSoup(html, "html.parser")
 
         links = []
+        # Buscar enlaces que parezcan eventos deportivos
         for a in soup.find_all("a", href=True):
             href = a["href"]
             text = a.get_text(strip=True)
-            if not href.startswith("https://tiroalpalome.com"):
-                continue
-            if "-" in text or " vs " in text.lower():
+            
+            # Asegurarse que sea una URL completa
+            if not href.startswith("http"):
+                if href.startswith("/"):
+                    href = f"https://tiroalpalome.com{href}"
+                else:
+                    href = f"https://tiroalpalome.com/{href}"
+            
+            # Filtrar por URLs que parezcan eventos
+            if "tiroalpalome.com" in href and ("-" in text or " vs " in text.lower()):
                 links.append((href, text))
 
         seen = set()
@@ -35,16 +47,24 @@ class TiroalpaloProvider(BaseProvider):
                 continue
             seen.add(href)
 
-            event = self._parse_event_page(href, text)
-            if event:
-                events.append(event)
+            try:
+                event = self._parse_event_page(href, text)
+                if event:
+                    events.append(event)
+            except Exception as e:
+                print(f"[Tiroalpalo] Error parseando {href}: {e}")
+                continue
 
         return events
 
     def _parse_event_page(self, url: str, fallback: str) -> Optional[Event]:
         try:
-            html = requests.get(url, timeout=10).text
-        except:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+            html = requests.get(url, timeout=15, headers=headers).text
+        except Exception as e:
+            print(f"[Tiroalpalo] Error descargando página: {e}")
             return None
 
         soup = BeautifulSoup(html, "html.parser")
@@ -57,6 +77,7 @@ class TiroalpaloProvider(BaseProvider):
         home = ""
         away = ""
 
+        # Intentar extraer hora del título
         m = re.match(r"(\d{1,2}:\d{2})\s*[|\-]?(.*)", title)
         if m:
             match_time = m.group(1)
@@ -64,10 +85,11 @@ class TiroalpaloProvider(BaseProvider):
         else:
             title_no_time = title
 
+        # Separar equipos
         if " vs " in title_no_time.lower():
             parts = re.split(r"\s+vs\s+", title_no_time, flags=re.IGNORECASE)
             if len(parts) == 2:
-                home, away = parts
+                home, away = parts[0].strip(), parts[1].strip()
         elif "-" in title_no_time:
             parts = title_no_time.split("-", 1)
             if len(parts) == 2:
@@ -75,39 +97,61 @@ class TiroalpaloProvider(BaseProvider):
         else:
             home = title_no_time
 
+        # Convertir hora a timestamp si existe
         start_ms = 0
         if match_time:
             try:
                 hh, mm = map(int, match_time.split(":"))
                 now = datetime.utcnow()
-                dt = now.replace(hour=hh, minute=mm, second=0)
+                dt = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
                 if dt < now:
-                    dt = dt.replace(day=now.day + 1)
+                    from datetime import timedelta
+                    dt = dt + timedelta(days=1)
                 start_ms = int(dt.timestamp() * 1000)
-            except:
+            except Exception as e:
+                print(f"[Tiroalpalo] Error convirtiendo hora: {e}")
                 pass
 
+        # Buscar streams (enlaces de transmisión)
         streams = []
+        
+        # Buscar iframes directos
+        for iframe in soup.find_all("iframe", src=True):
+            src = iframe.get("src")
+            if src and ("stream" in src.lower() or "embed" in src.lower()):
+                streams.append(Stream(
+                    name=f"Stream {len(streams) + 1}",
+                    url=src,
+                    source="Tiroalpalo"
+                ))
+        
+        # Buscar enlaces con texto de stream
         for a in soup.find_all("a", href=True):
             text = a.get_text(strip=True).lower()
-            if text.startswith("link") or text.startswith("alternativo"):
+            if any(keyword in text for keyword in ["link", "alternativo", "stream", "ver", "canal"]):
+                href = a["href"]
+                if not href.startswith("http"):
+                    continue
+                    
                 streams.append(Stream(
                     name=a.get_text(strip=True),
-                    url=a["href"],
+                    url=href,
                     source="Tiroalpalo"
                 ))
 
+        # Si no encontramos streams, no devolver el evento
         if not streams:
             return None
 
         return Event(
             id=url,
-            name=title_no_time,
+            name=title_no_time if title_no_time else f"{home} vs {away}",
             url=url,
             league="",
             home=home,
             away=away,
             start_time=start_ms,
             provider="Tiroalpalo",
-            streams=streams
+            streams=streams,
+            match_time=match_time or ""
         )

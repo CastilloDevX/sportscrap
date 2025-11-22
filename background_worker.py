@@ -5,12 +5,8 @@ from scrapers.service import ScraperService
 from scrapers.registry import provider_registry
 from dataclasses import asdict
 
-# Archivo de caché a escribir
 CACHE_FILE = "cache/events.json"
-
-# Instanciamos el servicio
 service = ScraperService(provider_registry)
-
 
 def run_scraping():
     """Ejecuta scraping de todos los providers y actualiza la caché."""
@@ -22,13 +18,20 @@ def run_scraping():
         with open(CACHE_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print(f"Scraping completado ({len(events)} eventos)")
+        
+        # Log por provider
+        from collections import Counter
+        providers = Counter(e.provider for e in events)
+        for prov, count in providers.items():
+            print(f"  - {prov}: {count} eventos")
+            
     except Exception as e:
         print(f"Error scraping: {e}")
-
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     print("Worker ejecutándose...")
     while True:
         run_scraping()
-        # Esperamos 2 minutos entre ejecuciones (puedes ajustarlo)
-        time.sleep(120)
+        time.sleep(120)  # 2 minutos

@@ -1,216 +1,354 @@
-/* ------------------------------------------
-   PALETA DE COLORES
--------------------------------------------*/
+/* Variables de color - Tema azul oscuro */
 :root {
-    --bg-main: #0d1117;
-    --bg-header-top: #0a0f1f;
-    --bg-header-mid: #0d2038;
-    --bg-header-bottom: #11345b;
-
-    --bg-card: #1e293b;
-    --bg-hover: #334155;
-
-    --text-main: #e2e8f0;
-    --text-muted: #94a3b8;
-
-    --accent-blue: #0ea5e9;
-    --accent-blue-light: #38bdf8;
+    --primary-bg: #1a2332;
+    --secondary-bg: #2d3e52;
+    --card-bg: #3d5169;
+    --card-hover: #4a6080;
+    --text-primary: #ffffff;
+    --text-secondary: #b0c4de;
+    --accent-color: #5b8cc9;
+    --header-gradient: linear-gradient(135deg, #2d4563 0%, #1a2332 100%);
 }
 
-/* ------------------------------------------
-   BODY
--------------------------------------------*/
-body.bg-app {
-    background-color: var(--bg-main) !important;
-    color: var(--text-main) !important;
-    font-family: "Inter", sans-serif;
+/* Reset y Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* ------------------------------------------
-   HEADER (NAVBAR) — GRADIENT
--------------------------------------------*/
-.bg-header {
-    background: linear-gradient(to bottom,
-            var(--bg-header-top) 0%,
-            var(--bg-header-mid) 45%,
-            var(--bg-header-bottom) 100%) !important;
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--primary-bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
 
-    color: white !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+/* Header */
+.navbar {
+    background: var(--header-gradient) !important;
+    border-bottom: 2px solid var(--accent-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .navbar-brand {
-    font-weight: 700;
-    font-size: 1.6rem;
+    font-size: 1.8rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    color: var(--text-primary) !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.navbar a {
-    color: var(--text-main) !important;
-    font-size: 1.1rem;
-}
-
-.navbar a:hover {
-    color: var(--accent-blue) !important;
-}
-
-/* ------------------------------------------
-   LOADER
--------------------------------------------*/
+/* Loader */
 .loader-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.70);
-    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 35, 50, 0.95);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    z-index: 9999;
 }
 
 .spinner-border {
     width: 3rem;
     height: 3rem;
-    color: var(--accent-blue) !important;
+    border: 4px solid var(--accent-color);
+    border-right-color: transparent;
 }
 
-/* ------------------------------------------
-   INPUTS / SELECT
--------------------------------------------*/
-.input-dark,
-.form-control,
-.form-select {
-    background-color: var(--bg-card) !important;
-    border: 1px solid #263043 !important;
-    color: var(--text-main) !important;
+/* Título principal */
+.display-5 {
+    font-weight: 700;
+    color: var(--text-primary);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 2rem !important;
+}
+
+/* Inputs y Filtros */
+.input-dark {
+    background-color: var(--secondary-bg) !important;
+    border: 2px solid var(--card-bg) !important;
+    color: var(--text-primary) !important;
     border-radius: 12px !important;
-    padding: 12px 16px !important;
+    padding: 0.75rem 1rem !important;
+    transition: all 0.3s ease;
+}
+
+.input-dark:focus {
+    background-color: var(--card-bg) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(91, 140, 201, 0.25) !important;
 }
 
 .input-dark::placeholder {
-    color: var(--text-muted) !important;
+    color: var(--text-secondary) !important;
 }
 
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.4) !important;
-}
-
-/* ------------------------------------------
-   BOTÓN "REFRESCAR"
--------------------------------------------*/
-.btn-refresh,
-button#refreshBtn {
-    background-color: var(--accent-blue) !important;
-    color: white !important;
-    border-radius: 10px !important;
-    padding: 12px 24px !important;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border: none;
-}
-
-.btn-refresh:hover,
-button#refreshBtn:hover {
-    background-color: var(--accent-blue-light) !important;
-}
-
-/* ------------------------------------------
-   TABLAS
--------------------------------------------*/
-.provider-table,
-.table-dark {
-    background-color: var(--bg-card) !important;
-    color: var(--text-main) !important;
-    border-radius: 16px !important;
-    overflow: hidden !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
-}
-
-.table-dark thead tr {
-    background-color: #111827 !important;
-    border-bottom: 2px solid #1f2937 !important;
-}
-
-.table-dark tbody tr {
-    transition: 0.12s background;
-}
-
-.table-dark tbody tr:hover {
-    background-color: var(--bg-hover) !important;
-}
-
-.table-dark th {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-.table-dark td {
-    font-size: 0.92rem;
-}
-
-/* ------------------------------------------
-   BOTONES STREAM
--------------------------------------------*/
-.btn-stream {
-    background-color: var(--accent-blue) !important;
-    border-radius: 8px !important;
-    color: white !important;
-    padding: 6px 12px !important;
-    font-size: 0.85rem !important;
-    font-weight: 600;
-    margin: 2px;
-    transition: 0.1s;
-}
-
-.btn-stream:hover {
-    background-color: var(--accent-blue-light) !important;
-}
-
-/* Para badges de idioma */
-.stream-tag {
-    background-color: rgba(255, 255, 255, 0.18);
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-size: 0.70rem;
-    color: var(--text-muted);
-    margin-left: 5px;
-}
-
-/* ------------------------------------------
-   PROVIDER BLOCKS
--------------------------------------------*/
+/* Secciones de Provider */
 .provider-block {
-    margin-bottom: 50px;
+    margin-bottom: 2.5rem;
+    animation: fadeIn 0.5s ease-in;
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Badges de Provider - Estilo tarjeta */
 .provider-badge {
-    color: white;
-    font-weight: 700;
-    font-size: 1.6rem;
-    margin-bottom: 10px;
+    display: inline-block;
+    padding: 0.6rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    background: var(--card-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
 }
 
-/* ------------------------------------------
-   PAGINATION
--------------------------------------------*/
-.pagination-controls button {
-    background: var(--bg-card) !important;
-    border: 1px solid #374151 !important;
-    color: var(--text-main) !important;
+.provider-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-color: var(--accent-color);
+}
+
+/* Colores específicos para cada opción */
+.provider-kakarotfoot {
+    background: linear-gradient(135deg, #4a5f7f 0%, #3d5169 100%);
+}
+
+.provider-kevinsport {
+    background: linear-gradient(135deg, #556b85 0%, #4a5f7f 100%);
+}
+
+.provider-livetv {
+    background: linear-gradient(135deg, #5b7a9a 0%, #556b85 100%);
+}
+
+.provider-tiroalpalo {
+    background: linear-gradient(135deg, #6589af 0%, #5b7a9a 100%);
+}
+
+/* Tabla */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.provider-table {
+    background: var(--secondary-bg) !important;
+    margin-bottom: 0 !important;
+}
+
+.provider-table thead {
+    background: var(--card-bg) !important;
+}
+
+.provider-table thead th {
+    border: none !important;
+    padding: 1rem !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.provider-table tbody tr {
+    background: var(--secondary-bg) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.2s ease;
+}
+
+.provider-table tbody tr:hover {
+    background: var(--card-bg) !important;
+    transform: scale(1.01);
+}
+
+.provider-table td {
+    padding: 1rem !important;
+    vertical-align: middle !important;
+    border: none !important;
+    color: var(--text-primary);
+}
+
+/* Marcador de vs */
+.text-danger {
+    color: var(--accent-color) !important;
+    font-weight: 600;
+}
+
+/* Botones */
+.btn-primary {
+    background: var(--accent-color) !important;
+    border: none !important;
     border-radius: 8px !important;
+    padding: 0.5rem 1.2rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(91, 140, 201, 0.3);
 }
 
-.pagination-controls button:hover {
-    background: var(--accent-blue) !important;
-    color: white !important;
+.btn-primary:hover {
+    background: #4a7ab8 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(91, 140, 201, 0.5);
+}
+
+.btn-secondary {
+    background: var(--card-bg) !important;
+    border: 2px solid var(--accent-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1.5rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-secondary:hover {
+    background: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    transform: translateY(-2px);
+}
+
+.btn-outline-light {
+    border: 2px solid var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    background: var(--secondary-bg) !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-outline-light:hover {
+    background: var(--card-bg) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Paginación */
+.pagination-controls {
+    margin-top: 1rem;
 }
 
 .page-info {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    background: var(--secondary-bg);
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* Stream Page */
+.btn-stream {
+    background: var(--card-bg) !important;
+    border: 2px solid var(--accent-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.2rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-stream:hover {
+    background: var(--accent-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(91, 140, 201, 0.4);
+}
+
+.stream-tag {
+    background: var(--accent-color);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Iframe container */
+.ratio {
+    background: var(--secondary-bg);
+    border: 3px solid var(--card-bg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Alerts */
+.alert-warning {
+    background: var(--card-bg) !important;
+    border: 2px solid #d4a94e !important;
+    color: var(--text-primary) !important;
+    border-radius: 12px !important;
+}
+
+/* Text utilities */
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.4rem !important;
+    }
+
+    .display-5 {
+        font-size: 1.8rem;
+    }
+
+    .provider-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .provider-table td,
+    .provider-table th {
+        padding: 0.75rem !important;
+        font-size: 0.9rem;
+    }
+}
+
+/* Scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--primary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--card-bg);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
 }

@@ -17,16 +17,25 @@ class KevinsportProvider(BaseProvider):
     URL = "https://kevinsport.pro/live/football/"
 
     def fetch_events(self) -> List[Event]:
-        return asyncio.run(self.fetch_events_async())
+        try:
+            return asyncio.run(self.fetch_events_async())
+        except Exception as e:
+            print(f"[KevinSport] Error en fetch_events: {e}")
+            return []
 
     async def fetch_events_async(self) -> List[Event]:
         events: List[Event] = []
 
-        async with aiohttp.ClientSession(headers={"User-Agent": "Mozilla/5.0"}) as session:
+        timeout = aiohttp.ClientTimeout(total=15)
+        async with aiohttp.ClientSession(
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=timeout
+        ) as session:
             try:
-                async with session.get(self.URL, timeout=10) as resp:
+                async with session.get(self.URL) as resp:
                     html = await resp.text()
-            except:
+            except Exception as e:
+                print(f"[KevinSport] Error descargando página principal: {e}")
                 return events
 
             soup = BeautifulSoup(html, "html.parser")
@@ -71,7 +80,10 @@ class KevinsportProvider(BaseProvider):
                 watch = row.find("a", href=True)
                 if not watch:
                     continue
+                    
                 event_page = watch["href"]
+                if not event_page.startswith("http"):
+                    event_page = f"https://kevinsport.pro{event_page}"
 
                 event = Event(
                     id=event_page,
@@ -89,15 +101,21 @@ class KevinsportProvider(BaseProvider):
                 events.append(event)
                 tasks.append(self._load_streams_async(session, event))
 
-            await asyncio.gather(*tasks)
+            # Esperar a que todos los streams se carguen
+            try:
+                await asyncio.gather(*tasks, return_exceptions=True)
+            except Exception as e:
+                print(f"[KevinSport] Error en gather de streams: {e}")
+                
             return events
 
     async def _load_streams_async(self, session, event: Event):
         # Página principal del evento
         try:
-            async with session.get(event.url, timeout=10) as r:
+            async with session.get(event.url) as r:
                 html = await r.text()
-        except:
+        except Exception as e:
+            print(f"[KevinSport] Error cargando evento {event.url}: {e}")
             return
 
         soup = BeautifulSoup(html, "html.parser")
@@ -107,6 +125,9 @@ class KevinsportProvider(BaseProvider):
         if iframe:
             src = iframe.get("src")
             if src:
+                if not src.startswith("http"):
+                    src = f"https:{src}" if src.startswith("//") else f"https://kevinsport.pro{src}"
+                    
                 event.streams.append(Stream(
                     name="Stream 1",
                     url=src,
@@ -120,11 +141,15 @@ class KevinsportProvider(BaseProvider):
             href = btn.get("href")
             if not href:
                 continue
+                
+            if not href.startswith("http"):
+                href = f"https://kevinsport.pro{href}"
 
             try:
-                async with session.get(href, timeout=10) as r2:
+                async with session.get(href) as r2:
                     sub_html = await r2.text()
-            except:
+            except Exception as e:
+                print(f"[KevinSport] Error en stream secundario {href}: {e}")
                 continue
 
             sub_soup = BeautifulSoup(sub_html, "html.parser")
@@ -135,6 +160,9 @@ class KevinsportProvider(BaseProvider):
 
             src = sub_iframe.get("src")
             if src:
+                if not src.startswith("http"):
+                    src = f"https:{src}" if src.startswith("//") else f"https://kevinsport.pro{src}"
+                    
                 event.streams.append(Stream(
                     name=btn.get_text(strip=True),
                     url=src,

@@ -46,9 +46,11 @@ def load_events():
 def datetime_filter(ts):
     try:
         ts = int(ts)
-        return datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S") if ts > 0 else "-"
+        if ts == 0:
+            return "Hoy"  # Cambiado de "-" a "Hoy"
+        return datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
-        return "-"
+        return "Hoy"  # Cambiado de "-" a "Hoy"
 
 
 # Proxy para esquivar bloqueos de referer
@@ -63,15 +65,18 @@ def proxy():
         "Referer": "https://kevinsport.digital/"
     }
 
-    r = requests.get(target, headers=headers)
-    return Response(r.content, content_type=r.headers.get("Content-Type"))
+    try:
+        r = requests.get(target, headers=headers, timeout=10)
+        return Response(r.content, content_type=r.headers.get("Content-Type"))
+    except Exception as e:
+        return f"Error al cargar el stream: {e}", 500
 
 
 # Página principal
 @app.route("/")
 def index():
     events = load_events()
-    return render_template("index.html", events=events, title="Sportstream")
+    return render_template("index.html", events=events, title="Inicio")
 
 
 # Endpoint opcional para consultar eventos vía AJAX
@@ -99,24 +104,32 @@ def stream():
     # Los streams normalmente ya vienen en el evento cacheado
     event_streams = event_obj.get("streams", [])
 
-    # Recargar streams para LiveTV, Kevinsport, etc. si el usuario lo pide
+    # Recargar streams para LiveTV si es necesario
     if source and "livetv" in source.lower():
         from scrapers.providers.livetv import LiveTVProvider
+        from scrapers.models import Stream
+        
         provider = LiveTVProvider()
-        event_streams = provider._parse_event_streams(event_obj["url"])
+        # load_streams devuelve objetos Stream, los convertimos a dict
+        stream_objects = provider.load_streams(event_obj["url"])
+        event_streams = [asdict(s) for s in stream_objects]
+        
     elif source and "kevinsport" in source.lower():
-        from scrapers.providers.kevinsport import KevinsportProvider
-        provider = KevinsportProvider()
-        event_streams = provider._get_event_streams(event_obj["url"])
+        # Para KevinSport, los streams ya están en caché como dicts
         if url:
             url = f"/proxy?u={url}"
+            
     elif source and "kakarot" in source.lower():
         # Los streams de Kakarotfoot vienen listos en caché
         pass
 
     # Si no hay URL pero hay streams, elegimos el primero
     if not url and event_streams:
-        url = event_streams[0]["url"]
+        # Manejar tanto objetos Stream como dicts
+        if isinstance(event_streams[0], dict):
+            url = event_streams[0]["url"]
+        else:
+            url = event_streams[0].get("url")
 
     return render_template(
         "stream.html",

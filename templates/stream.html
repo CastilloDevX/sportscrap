@@ -1,13 +1,44 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2 class="h4 mb-1">Reproducción en directo</h2>
+<div class="mb-4">
+  <h2 class="h4 mb-2">Reproducción en directo</h2>
 
-{% if source %}
-<p class="text-muted small mb-4">
-  Fuente: {{ source }}
-</p>
-{% endif %}
+  {% if event %}
+  <div class="d-flex align-items-center gap-3 mb-3">
+    <h3 class="h5 mb-0">
+      <strong>{{ event.home }}</strong>
+      {% if event.away %}
+      <span class="text-danger mx-2">vs</span>
+      <strong>{{ event.away }}</strong>
+      {% endif %}
+    </h3>
+
+    {% if event.league %}
+    <span class="badge" style="background: var(--card-bg); border: 2px solid var(--accent-color);">
+      {{ event.league }}
+    </span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if source %}
+  <p class="text-muted small">
+    Fuente:
+    {% if source == 'Kakarotfoot' %}
+    Opción 1
+    {% elif source == 'KevinSport' %}
+    Opción 2
+    {% elif source == 'LiveTV' %}
+    Opción 3
+    {% elif source == 'Tiroalpalo' %}
+    Opción 4
+    {% else %}
+    {{ source }}
+    {% endif %}
+  </p>
+  {% endif %}
+</div>
 
 <!-- STREAM PRINCIPAL -->
 <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm mb-4">
@@ -15,34 +46,64 @@
   <iframe src="{{ url }}" allowfullscreen loading="lazy" style="width:100%; height:100%; border:0;">
   </iframe>
   {% else %}
-  <div class="d-flex justify-content-center align-items-center h-100 text-muted">
-    <p>No hay stream principal disponible.</p>
+  <div class="d-flex justify-content-center align-items-center h-100" style="background: var(--secondary-bg);">
+    <div class="text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-play-circle mb-3"
+        viewBox="0 0 16 16" style="color: var(--accent-color);">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+        <path
+          d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445" />
+      </svg>
+      <p class="text-muted">No hay stream principal disponible.</p>
+    </div>
   </div>
   {% endif %}
 </div>
 
 <!-- CANALES DISPONIBLES -->
-{% if event_streams %}
-<h4 class="mb-3">Canales disponibles</h4>
+{% if event_streams and event_streams|length > 0 %}
+<div class="mb-4">
+  <h4 class="h5 mb-3">Canales disponibles</h4>
 
-<div class="d-flex flex-wrap gap-2 mb-4">
-  {% for s in event_streams %}
-  <a href="/stream?url={{ s.url | urlencode }}&source={{ s.source | urlencode }}&event={{ event.id }}"
-    class="btn btn-stream">
-    {{ s.name }}
+  <div class="d-flex flex-wrap gap-2">
+    {% for s in event_streams %}
+    <a href="/stream?url={{ s.url | urlencode }}&source={{ s.source | urlencode }}&event={{ event.id }}"
+      class="btn btn-stream">
 
-    {% if s.language %}
-    <span class="stream-tag">{{ s.language|upper }}</span>
-    {% endif %}
-  </a>
-  {% endfor %}
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-broadcast"
+        viewBox="0 0 16 16">
+        <path
+          d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 0 1 .707.707m2.122 2.122a4 4 0 0 0 0 5.656.5.5 0 1 1-.708.708 5 5 0 0 1 0-7.072.5.5 0 0 1 .708.708m5.656-.708a.5.5 0 0 1 .708 0 5 5 0 0 1 0 7.072.5.5 0 1 1-.708-.708 4 4 0 0 0 0-5.656.5.5 0 0 1 0-.708m2.122-2.12a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.313.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707M10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0" />
+      </svg>
+
+      {{ s.name }}
+
+      {% if s.language %}
+      <span class="stream-tag">{{ s.language|upper }}</span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
 </div>
 {% else %}
 <div class="alert alert-warning">
-  No hay canales disponibles para este evento.
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+    class="bi bi-exclamation-triangle me-2" viewBox="0 0 16 16">
+    <path
+      d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z" />
+    <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
+  </svg>
+  No hay canales adicionales disponibles para este evento.
 </div>
 {% endif %}
 
-<a href="/" class="btn btn-secondary">&laquo; Volver</a>
+<a href="/" class="btn btn-secondary">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2"
+    viewBox="0 0 16 16">
+    <path fill-rule="evenodd"
+      d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
+  </svg>
+  Volver a la agenda
+</a>
 
 {% endblock %}
